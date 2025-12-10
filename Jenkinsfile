@@ -118,7 +118,7 @@ pipeline {
                     // 
                     // We use '|| true' to prevent the pipeline from failing immediately if vulnerabilities are found,
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
-                    sh """
+                    sh '''
                         ./cortexcli code scan \
                             --api-base-url "${CORTEX_CLOUD_API_URL}" \
                             --api-key "${CORTEX_CLOUD_API_KEY}" \
@@ -129,7 +129,7 @@ pipeline {
                             --upload-mode upload \
                             --output json \
                             --output-file-path ./code_scan_results.json || true
-                    """
+                    '''
                 }
             }
         }
@@ -158,13 +158,13 @@ pipeline {
                     // 'image scan': The subcommand for container analysis.
                     // The last argument is the image tag to scan.
                     
-                    sh """
+                    sh '''
                         ./cortexcli image scan \
                             --api-base-url "${CORTEX_CLOUD_API_URL}" \
                             --api-key "${CORTEX_CLOUD_API_KEY}" \
                             --api-key-id "${CORTEX_CLOUD_API_KEY_ID}" \
                             "${IMAGE_NAME}:${IMAGE_TAG}" || true
-                    """
+                    '''
                 }
             }
         }
