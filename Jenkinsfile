@@ -210,8 +210,16 @@ pipeline {
     // Post-build actions to clean up and archive reports
     post {
         always {
-            archiveArtifacts artifacts: '*.json', allowEmptyArchive: true
-            cleanWs()
+            script {
+                try {
+                    // Try to archive and clean up
+                    archiveArtifacts artifacts: '*.json', allowEmptyArchive: true
+                    cleanWs()
+                } catch (Exception e) {
+                    // This handles cases where the Docker agent died early (like missing credentials)
+                    echo "Warning: Could not archive artifacts or clean workspace. The agent may have failed to start. (Error: ${e.message})"
+                }
+            }
         }
     }
-}
+} // End of pipeline
