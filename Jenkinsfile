@@ -120,7 +120,7 @@ pipeline {
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
                     sh '''
                         ./cortexcli code scan \
-                            --api-base-url "${CORTEX_CLOUD_API_URL}" \
+                            --api-base-url "${CLOUD_API_URL}" \
                             --api-key "${CORTEX_CLOUD_API_KEY}" \
                             --api-key-id "${CORTEX_CLOUD_API_KEY_ID}" \
                             --directory . \
