@@ -108,6 +108,11 @@ pipeline {
             steps {
                 script {
                     echo "--- Step 4: Running Cortex Code Scan ---"
+                    // We define variables here to strip any accidental whitespace (newlines) from the credentials
+                    def cleanUrl = CORTEX_CLOUD_API_URL.trim()
+                    def cleanKey = CORTEX_CLOUD_API_KEY.trim()
+                    def cleanKeyId = CORTEX_CLOUD_API_KEY_ID.trim()
+                    def cleanRepoId = GITHUB_REPO_ID.trim()
                     // Explanation of Flags [1, 7]:
                     // --api-base-url: The tenant URL.
                     // --directory .: Scan the current workspace directory.
@@ -120,11 +125,11 @@ pipeline {
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
                     sh '''
                         ./cortexcli code scan \
-                            --api-base-url "${CLOUD_API_URL}" \
-                            --api-key "${CORTEX_CLOUD_API_KEY}" \
-                            --api-key-id "${CORTEX_CLOUD_API_KEY_ID}" \
+                            --api-base-url "${cleanUrl}" \
+                            --api-key "${cleanKey }" \
+                            --api-key-id "${cleanKeyId}" \
                             --directory . \
-                            --repo-id "${GITHUB_REPO_ID}" \
+                            --repo-id "${cleanRepoId}" \
                             --branch "main" \
                             --upload-mode upload \
                             --output json \
@@ -154,15 +159,19 @@ pipeline {
             steps {
                 script {
                     echo "--- Step 6: Running Cortex Image Scan ---"
+                    // Cleaning whitespace again to prevent the "Required flags not set" error
+                    def cleanUrl = CORTEX_CLOUD_API_URL.trim()
+                    def cleanKey = CORTEX_CLOUD_API_KEY.trim()
+                    def cleanKeyId = CORTEX_CLOUD_API_KEY_ID.trim()
                     // Explanation of Commands [8]:
                     // 'image scan': The subcommand for container analysis.
                     // The last argument is the image tag to scan.
                     
                     sh '''
                         ./cortexcli image scan \
-                            --api-base-url "${CORTEX_CLOUD_API_URL}" \
-                            --api-key "${CORTEX_CLOUD_API_KEY}" \
-                            --api-key-id "${CORTEX_CLOUD_API_KEY_ID}" \
+                            --api-base-url "${cleanUrl}" \
+                            --api-key "${cleanKey}" \
+                            --api-key-id "${cleanKeyId}" \
                             "${IMAGE_NAME}:${IMAGE_TAG}" || true
                     '''
                 }
