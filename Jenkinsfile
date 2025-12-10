@@ -40,7 +40,7 @@ pipeline {
 
         //
         // GITHUB_REPO_URL
-        // maps to the secret text ID 'GITHUH_REPO_ID'
+        // maps to the secret text ID 'GITHUB_REPO_ID'
         GITHUB_REPO_ID = credentials('GITHUB_REPO_ID')
         
         //
