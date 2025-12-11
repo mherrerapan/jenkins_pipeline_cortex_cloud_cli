@@ -130,6 +130,12 @@ pipeline {
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
                     
                     sh '''
+                        # 1. Enable Shell Verbosity (Prints every command being run)
+                        set -x
+
+                        # 2. RUN COMMAND
+                        # "2>&1" -> Merges errors into standard output so you see them.
+
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
                         CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
                         CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
@@ -146,7 +152,7 @@ pipeline {
                             --branch "main" \
                             --upload-mode upload \
                             --output cli \
-                            --source "JENKINS" \
+                            --source "JENKINS" \ 2>&1
                             --output-file-path ./code_scan_results.json #|| true
                     '''
                 }
@@ -179,6 +185,12 @@ pipeline {
                     // --output options --> (human-readable, json (default: human-readable)).
                     
                     sh '''
+                        # 1. Enable Shell Verbosity (Prints every command being run)
+                        set -x
+
+                        # 2. RUN COMMAND
+                        # "2>&1" -> Merges errors into standard output so you see them.
+
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
                         CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
                         CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
@@ -189,7 +201,7 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
+                            "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 #|| true
                     '''
                 }
             }
@@ -206,6 +218,12 @@ pipeline {
                     echo "--- Step 7: Generating SBOM ---"
                     
                     sh '''
+                        # 1. Enable Shell Verbosity (Prints every command being run)
+                        set -x
+
+                        # 2. RUN COMMAND
+                        # "2>&1" -> Merges errors into standard output so you see them.
+
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
                         CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
                         CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
@@ -220,7 +238,7 @@ pipeline {
                             image sbom \
                             --output-format json \
                             --output-file "sbom-${BUILD_NUMBER}.json" \
-                            "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
+                            "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 #|| true
                     '''
                 }
             }
