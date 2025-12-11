@@ -192,13 +192,11 @@ pipeline {
                     // 'image scan': The subcommand for container analysis.
                     // The last argument is the image tag to scan.
                     // --output options --> (human-readable, json (default: human-readable)).
+                    // "2>&1" -> Merges errors into standard output so you see them.
                     
                     sh '''
                         # 1. Enable Shell Verbosity (Prints every command being run)
                         set -x
-
-                        # 2. RUN COMMAND
-                        # "2>&1" -> Merges errors into standard output so you see them.
 
                         # 3. Prerequisite Check: Ensure Java is working (Required for CLI)
                         java -version
@@ -210,6 +208,16 @@ pipeline {
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
                         CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
                         CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
+
+                        # 2. RUN COMMANDS TO DEBUG
+                        # Enable Python Verbosity (since the CLI is Python-based)
+                        export PYTHONVERBOSE=1
+                        # Check tar file
+                        ls -lh scan_target.tar
+                        # Check Network Connectivity (Is the API reachable?) -I fetches headers only (faster), -k ignores SSL errors (optional)
+                        curl -I -v "$CLEAN_URL" || echo "WARNING: Curl failed to reach API"
+                        # Check CLI Manual (What flags does this version ACTUALLY support?)
+                        ./cortexcli image scan --help || true
 
                         # 5. Debugging: List images to ensure the tag exists and Docker is accessible
                         echo "--- Debug: Docker Images Available ---"
