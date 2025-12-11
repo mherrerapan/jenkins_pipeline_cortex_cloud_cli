@@ -9,7 +9,7 @@ pipeline {
     // 2. We meet the Cortex CLI requirement for GLIBC >= 2.35 (Bookworm provides 2.36).
     agent {
         docker {
-            image 'cimg/node:20.11.0'
+            image 'node:22-bookworm'
             // We mount the Docker socket to allow "Docker-in-Docker".
             // This is required so the pipeline can run 'docker build' commands.
             args '-u root --privileged -v /var/run/docker.sock:/var/run/docker.sock'
@@ -73,7 +73,7 @@ pipeline {
                     // 2. curl (for downloading)
                     // 3. docker-ce-cli (for docker commands)
                     // 4. default-jre (Java 11+ is REQUIRED for cortexcli image scan) 
-                    sh 'apt-get update && apt-get install -y jq curl docker-ce-cli default-jre git openjdk-17-jre-headless libhyperscan5'
+                    sh 'apt-get update && apt-get install -y jq curl docker-ce-cli default-jre git openjdk-17-jre docker.io'
 
                     echo "--- Step 3: Downloading Cortex CLI ---"
                     // Download logic using the authenticated API endpoint
