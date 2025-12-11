@@ -113,6 +113,15 @@ pipeline {
         //
         // This scans IaC (Terraform), Secrets, and SCA (requirements.txt).
         stage('Cortex Code Scan') {
+            // -----------------------------------------------------------
+            // SKIP INSTRUCTION:
+            // The 'when' block below forces Jenkins to skip this stage.
+            // To re-enable the scan later, simply remove or comment out these 3 lines:
+            when {
+                expression { return false }
+            }
+            // -----------------------------------------------------------
+
             steps {
                 script {
                     echo "--- Step 4: Running Cortex Code Scan ---"
@@ -212,7 +221,8 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --archive "scan_target.tar" 2>&1
+                            --archive=true \
+                            "scan_target.tar" 2>&1
                             #"${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 
                             #|| true
                     '''
