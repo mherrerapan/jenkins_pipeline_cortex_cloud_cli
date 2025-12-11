@@ -227,8 +227,9 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             --log-level debug \
+                            image scan \
                             --timeout 300 \
-                            image scan "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
+                            "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
                     '''
                 }
             }
@@ -271,7 +272,6 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             --log-level debug \
-                            --timeout 300 \
                             image sbom "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 \
                             --output-format json \
                             --output-file "sbom-${BUILD_NUMBER}.json" #|| true 
