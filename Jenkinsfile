@@ -271,7 +271,7 @@ pipeline {
                             --api-key-id "$CLEAN_KEY_ID" \
                             image sbom "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 \
                             --output-format json \
-                            --output-file "sbom-${BUILD_NUMBER}.json" \#|| true 
+                            --output-file "sbom-${BUILD_NUMBER}.json" #|| true 
                             
                     '''
                 }
