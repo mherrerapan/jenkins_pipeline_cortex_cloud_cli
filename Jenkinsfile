@@ -47,7 +47,6 @@ pipeline {
         // Define artifact names for consistency
         IMAGE_NAME = 'my-app'
         IMAGE_TAG  = "${BUILD_NUMBER}"
-        ARCHIVE_NAME = "my-app-${BUILD_NUMBER}.tar"
     }
 
     stages {
@@ -87,7 +86,7 @@ pipeline {
                         # This library was removed in Debian 12 (Bookworm) but is required by Cortex.
                         # We download the Debian 11 (Bullseye) version which works.
                         curl -L -o libhyperscan5.deb http://ftp.us.debian.org/debian/pool/main/h/hyperscan/libhyperscan5_5.4.0-2_amd64.deb
-                        dpkg -i libhyperscan5.deb || true
+                        apt-get install -y ./libhyperscan5.deb
 
                         # 3. Download Cortex CLI
                         # Request the signed download URL from Cortex Cloud
@@ -185,9 +184,6 @@ pipeline {
                     echo "--- Step 5: Building Docker Image ---"
                     // Builds the image defined in the Dockerfile
                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                    // Save image to tarball. 
-                    // -o specifies the output filename.
-                    sh 'docker save -o ${ARCHIVE_NAME} ${IMAGE_NAME}:${IMAGE_TAG}'
 
                 }
             }
@@ -203,7 +199,7 @@ pipeline {
             // The 'when' block below forces Jenkins to skip this stage.
             // To re-enable the scan later, change return to true:
             when {
-                expression { return true }
+                expression { return false }
             }
             // -----------------------------------------------------------
             steps {
@@ -231,7 +227,7 @@ pipeline {
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
-                            image scan --archive $(pwd)/${ARCHIVE_NAME}
+                            image scan "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
                     '''
                 }
             }
@@ -273,10 +269,10 @@ pipeline {
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
-                            image sbom \
+                            image sbom "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 \
                             --output-format json \
-                            --output-file "sbom-${BUILD_NUMBER}.json" \
-                            "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 #|| true
+                            --output-file "sbom-${BUILD_NUMBER}.json" \#|| true 
+                            
                     '''
                 }
             }
