@@ -152,8 +152,8 @@ pipeline {
                             --branch "main" \
                             --upload-mode upload \
                             --output cli \
-                            --source "JENKINS" \ 2>&1
-                            --output-file-path ./code_scan_results.json #|| true
+                            --source "JENKINS" 2>&1 #|| true
+                            #--output-file-path ./code_scan_results.json 2>&1 
                     '''
                 }
             }
