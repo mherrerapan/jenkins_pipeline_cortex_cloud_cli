@@ -231,9 +231,7 @@ pipeline {
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
-                            image scan \
-                            --archive true \
-                            ${ARCHIVE_NAME}
+                            image scan --archive $(pwd)/${ARCHIVE_NAME}
                     '''
                 }
             }
