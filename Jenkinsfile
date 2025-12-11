@@ -116,7 +116,7 @@ pipeline {
             // The 'when' block below forces Jenkins to skip this stage.
             // To re-enable the scan later, change return to true:
             when {
-                expression { return true }
+                expression { return flase }
             }
             // -----------------------------------------------------------
 
@@ -135,6 +135,7 @@ pipeline {
                     // --output options --> (e.g., json, sarif, junitxml, spdx, cli, cyclonedx, cyclonedx_json).
                     // We use '|| true' to prevent the pipeline from failing immediately if vulnerabilities are found,
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
+                    // --log-level debug \ if you want to see more detailed logs
                     
                     sh '''
                         # 1. Enable Shell Verbosity (Prints every command being run)
@@ -153,7 +154,6 @@ pipeline {
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
-                            --log-level debug \
                             code scan \
                             --directory . \
                             --repo-id "$CLEAN_REPO_ID" \
