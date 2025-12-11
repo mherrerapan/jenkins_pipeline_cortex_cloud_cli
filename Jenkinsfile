@@ -9,7 +9,7 @@ pipeline {
     // 2. We meet the Cortex CLI requirement for GLIBC >= 2.35 (Bookworm provides 2.36).
     agent {
         docker {
-            image 'node:22-bookworm'
+            image 'cimg/node:22.17.0'
             // We mount the Docker socket to allow "Docker-in-Docker".
             // This is required so the pipeline can run 'docker build' commands.
             args '-u root --privileged -v /var/run/docker.sock:/var/run/docker.sock'
@@ -204,6 +204,7 @@ pipeline {
             steps {
                 script {
                     echo "--- Step 6: Running Cortex Image Scan ---"
+
                     // Explanation of Commands [8]:
                     // 'image scan': The subcommand for container analysis.
                     // The last argument is the image tag to scan.
