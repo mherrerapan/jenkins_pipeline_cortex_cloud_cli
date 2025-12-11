@@ -1,4 +1,4 @@
-FROM python:3.7-bullseye
+FROM debian:bullseye-slim
 
 WORKDIR /app
 
