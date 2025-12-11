@@ -147,7 +147,7 @@ pipeline {
                             --upload-mode upload \
                             --output cli \
                             --source "JENKINS" \
-                            #--output-file-path ./code_scan_results.json || true
+                            --output-file-path ./code_scan_results.json #|| true
                     '''
                 }
             }
@@ -189,7 +189,6 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --output-format human-readable \
                             "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
                     '''
                 }
