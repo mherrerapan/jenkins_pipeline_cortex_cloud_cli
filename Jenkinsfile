@@ -73,7 +73,7 @@ pipeline {
                     // 2. curl (for downloading)
                     // 3. docker-ce-cli (for docker commands)
                     // 4. default-jre (Java 11+ is REQUIRED for cortexcli image scan) 
-                    sh 'apt-get update && apt-get install -y jq curl docker-ce-cli default-jre binutils'
+                    sh 'apt-get update && apt-get install -y jq curl docker-ce-cli default-jre git'
 
                     echo "--- Step 3: Downloading Cortex CLI ---"
                     // Download logic using the authenticated API endpoint
@@ -116,7 +116,7 @@ pipeline {
             // The 'when' block below forces Jenkins to skip this stage.
             // To re-enable the scan later, change return to true:
             when {
-                expression { return false }
+                expression { return true }
             }
             // -----------------------------------------------------------
 
@@ -155,7 +155,7 @@ pipeline {
                             --api-key-id "$CLEAN_KEY_ID" \
                             --log-level debug \
                             code scan \
-                            --directory . \
+                            --directory "\$(pwd)" \
                             --repo-id "$CLEAN_REPO_ID" \
                             --branch "main" \
                             --upload-mode upload \
