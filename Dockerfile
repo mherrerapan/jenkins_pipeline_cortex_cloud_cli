@@ -1,13 +1,19 @@
-FROM python:3.11-slim-bullseye
-
+FROM ubuntu:22.04
 
 WORKDIR /app
 
-# Copy only the requirements file first to leverage build cache
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# 1. Install Python 3 & Pip (minimal flags to keep size down)
+# --no-install-recommends: Skips heavy extras (like documentation/optional libs)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 python3-pip && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy the rest of the application source code
+# 2. Install App Dependencies
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# 3. Copy Application
 COPY . .
 
-CMD ["python", "app.py"]
+# 4. Run
+CMD ["python3", "app.py"]
