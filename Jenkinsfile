@@ -98,6 +98,8 @@ pipeline {
                         # Download and Install
                         curl -o cortexcli "$download_url"
                         chmod +x ./cortexcli
+                        # Lists all shared libraries the CLI needs
+                        ldd ./cortexcli 
                         
                         # Verify
                         ./cortexcli --version
