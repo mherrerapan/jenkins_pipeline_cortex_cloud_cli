@@ -1,4 +1,5 @@
-FROM python:3.7-slim
+FROM python:3.7-bullseye
+
 WORKDIR /app
 
 # Copy only the requirements file first to leverage build cache
