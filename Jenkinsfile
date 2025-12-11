@@ -145,7 +145,7 @@ pipeline {
                             --repo-id "$CLEAN_REPO_ID" \
                             --branch "main" \
                             --upload-mode upload \
-                            --output cli \ 
+                            --output cli \
                             --source "JENKINS" \
                             #--output-file-path ./code_scan_results.json || true
                     '''
@@ -189,7 +189,7 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --output cli \ 
+                            --output cli \
                             "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
                     '''
                 }
