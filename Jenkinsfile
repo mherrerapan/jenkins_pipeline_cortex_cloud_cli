@@ -191,22 +191,29 @@ pipeline {
                         # 2. RUN COMMAND
                         # "2>&1" -> Merges errors into standard output so you see them.
 
+                        # 3. Prerequisite Check: Ensure Java is working (Required for CLI)
+                        java -version
+
+                        # 4. Export Docker Image to Tar file
+                        echo "--- Saving Docker image to tar file... ---"
+                        docker save -o scan_target.tar "${IMAGE_NAME}:${IMAGE_TAG}"
+
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
                         CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
                         CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
 
-                        # 2. Debugging: List images to ensure the tag exists and Docker is accessible
+                        # 5. Debugging: List images to ensure the tag exists and Docker is accessible
                         echo "--- Debug: Docker Images Available ---"
                         docker images
 
-                        # 3. RUN COMMAND (With Auth Flags First)
+                        # 6. RUN COMMAND (With Auth Flags First)
                         ./cortexcli \
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --docker-host "unix:///var/run/docker.sock" \
-                            "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 
+                            --archive "scan_target.tar" 2>&1
+                            #"${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 
                             #|| true
                     '''
                 }
