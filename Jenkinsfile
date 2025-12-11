@@ -182,7 +182,7 @@ pipeline {
                 script {
                     echo "--- Step 5: Building Docker Image ---"
                     // Builds the image defined in the Dockerfile
-                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    sh "docker build --no-cache -t ${IMAGE_NAME}:${IMAGE_TAG} ."
 
                 }
             }
