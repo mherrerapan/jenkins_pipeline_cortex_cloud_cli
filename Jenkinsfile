@@ -116,7 +116,7 @@ pipeline {
             // -----------------------------------------------------------
             // SKIP INSTRUCTION:
             // The 'when' block below forces Jenkins to skip this stage.
-            // To re-enable the scan later, simply remove or comment out these 3 lines:
+            // To re-enable the scan later, change return to true:
             when {
                 expression { return false }
             }
@@ -171,6 +171,14 @@ pipeline {
         //
         // STAGE 4: Artifact Build
         stage('Build Docker Image') {
+            // -----------------------------------------------------------
+            // SKIP INSTRUCTION:
+            // The 'when' block below forces Jenkins to skip this stage.
+            // To re-enable the scan later, change return to true:
+            when {
+                expression { return true }
+            }
+            // -----------------------------------------------------------
             steps {
                 script {
                     echo "--- Step 5: Building Docker Image ---"
@@ -185,6 +193,14 @@ pipeline {
         //
         // This scans the built container for OS-level vulnerabilities.
         stage('Cortex Image Scan') {
+            // -----------------------------------------------------------
+            // SKIP INSTRUCTION:
+            // The 'when' block below forces Jenkins to skip this stage.
+            // To re-enable the scan later, change return to true:
+            when {
+                expression { return true }
+            }
+            // -----------------------------------------------------------
             steps {
                 script {
                     echo "--- Step 6: Running Cortex Image Scan ---"
@@ -195,44 +211,43 @@ pipeline {
                     // "2>&1" -> Merges errors into standard output so you see them.
                     
                     sh '''
-                        # 1. Enable Shell Verbosity (Prints every command being run)
                         set -x
-
-                        # 3. Prerequisite Check: Ensure Java is working (Required for CLI)
-                        java -version
-
-                        # 4. Export Docker Image to Tar file
-                        echo "--- Saving Docker image to tar file... ---"
-                        docker save -o scan_target.tar "${IMAGE_NAME}:${IMAGE_TAG}"
-
+                        
+                        # 1. Setup Variables
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
                         CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
                         CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
 
-                        # 2. RUN COMMANDS TO DEBUG
-                        # Enable Python Verbosity (since the CLI is Python-based)
-                        export PYTHONVERBOSE=1
-                        # Check tar file
-                        ls -lh scan_target.tar
-                        # Check Network Connectivity (Is the API reachable?) -I fetches headers only (faster), -k ignores SSL errors (optional)
-                        curl -I -v "$CLEAN_URL" || echo "WARNING: Curl failed to reach API"
-                        # Check CLI Manual (What flags does this version ACTUALLY support?)
-                        ./cortexcli image scan --help || true
+                        # 2. Prerequisites
+                        java -version
 
-                        # 5. Debugging: List images to ensure the tag exists and Docker is accessible
-                        echo "--- Debug: Docker Images Available ---"
-                        docker images
+                        # 3. Create Archive (Save Docker image to file)
+                        echo "--- Saving Docker image to tar file... ---"
+                        docker save -o scan_target.tar "${IMAGE_NAME}:${IMAGE_TAG}"
+                        
+                        # Define Absolute Path (Helps avoid "file not found" errors)
+                        TAR_PATH="$(pwd)/scan_target.tar"
+                        ls -lh "$TAR_PATH"
 
-                        # 6. RUN COMMAND (With Auth Flags First)
+                        # 4. CRITICAL DEBUG: Run Help WITH KEYS
+                        # We must see the manual to know if it expects "--archive" or "--archive=true"
+                        echo "--- Debug: Printing CLI Manual ---"
+                        ./cortexcli \
+                            --api-base-url "$CLEAN_URL" \
+                            --api-key "$CLEAN_KEY" \
+                            --api-key-id "$CLEAN_KEY_ID" \
+                            image scan --help || true
+
+                        # 5. RUN SCAN (Absolute Path Method)
+                        # Trying the syntax exactly as described in your docs: "--archive <filename>"
+                        echo "--- Running Scan on $TAR_PATH ---"
+                        
                         ./cortexcli \
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --archive=true \
-                            "scan_target.tar" 2>&1
-                            #"${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 
-                            #|| true
+                            --archive "$TAR_PATH" 2>&1
                     '''
                 }
             }
@@ -244,6 +259,14 @@ pipeline {
         // This generates a Software Bill of Materials (SBOM) for the image 
         // we just built and saves it as a JSON file.
         stage('Generate SBOM') {
+            // -----------------------------------------------------------
+            // SKIP INSTRUCTION:
+            // The 'when' block below forces Jenkins to skip this stage.
+            // To re-enable the scan later, change return to true:
+            when {
+                expression { return true }
+            }
+            // -----------------------------------------------------------
             steps {
                 script {
                     echo "--- Step 7: Generating SBOM ---"
@@ -280,6 +303,14 @@ pipeline {
         //
         // Included per request for future use.
         stage('Deploy to AWS (Future)') {
+            // -----------------------------------------------------------
+            // SKIP INSTRUCTION:
+            // The 'when' block below forces Jenkins to skip this stage.
+            // To re-enable the scan later, change return to true:
+            when {
+                expression { return true }
+            }
+            // -----------------------------------------------------------
             steps {
                 script {
                     echo "--- AWS Deployment Skipped (Uncomment to enable) ---"
