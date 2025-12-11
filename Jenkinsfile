@@ -144,7 +144,6 @@ pipeline {
                             --upload-mode upload \
                             --output table \
                             --source "JENKINS" \
-                            --soft-fail \
                             --skip-file "./Jenkinsfile"
                             #--output-file-path ./code_scan_results.json || true
                     '''
