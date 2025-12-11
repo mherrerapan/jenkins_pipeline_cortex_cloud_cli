@@ -247,7 +247,6 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --archive "$TAR_PATH" \
                             --name "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
                     '''
                 }
