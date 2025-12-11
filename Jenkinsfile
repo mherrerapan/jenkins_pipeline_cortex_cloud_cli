@@ -160,8 +160,9 @@ pipeline {
                             --branch "main" \
                             --upload-mode upload \
                             --output cli \
-                            --source "JENKINS" 2>&1 #|| true
-                            #--output-file-path ./code_scan_results.json 2>&1 
+                            --source "JENKINS" 2>&1 
+                            --create-repo-if-missing
+                            #--output-file-path ./code_scan_results.json 2>&1 || true
                     '''
                 }
             }
@@ -210,28 +211,29 @@ pipeline {
                     // The last argument is the image tag to scan.
                     // --output options --> (human-readable, json (default: human-readable)).
                     // "2>&1" -> Merges errors into standard output so you see them.
-                    
-                    sh '''
-                        set -x
-                        
-                        # 1. Setup Variables
-                        CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
-                        CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
-                        CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                        sh '''
+                            set -x
+                            
+                            # 1. Setup Variables
+                            CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
+                            CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
+                            CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
 
-                        # 2. Prerequisites
-                        java -version
+                            # 2. Prerequisites
+                            java -version
 
-                        # 5. RUN SCAN (Absolute Path Method)
-                        ./cortexcli \
-                            --api-base-url "$CLEAN_URL" \
-                            --api-key "$CLEAN_KEY" \
-                            --api-key-id "$CLEAN_KEY_ID" \
-                            --log-level debug \
-                            image scan \
-                            --timeout 300 \
-                            "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
-                    '''
+                            # 5. RUN SCAN (Absolute Path Method)
+                            ./cortexcli \
+                                --api-base-url "$CLEAN_URL" \
+                                --api-key "$CLEAN_KEY" \
+                                --api-key-id "$CLEAN_KEY_ID" \
+                                --log-level debug \
+                                image scan \
+                                --timeout 300 \
+                                "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
+                        '''
+                    }
                 }
             }
         }
@@ -292,7 +294,7 @@ pipeline {
             // The 'when' block below forces Jenkins to skip this stage.
             // To re-enable the scan later, change return to true:
             when {
-                expression { return true }
+                expression { return false }
             }
             // -----------------------------------------------------------
             steps {
