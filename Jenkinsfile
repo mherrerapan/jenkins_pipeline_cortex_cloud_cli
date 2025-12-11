@@ -145,9 +145,9 @@ pipeline {
                             --repo-id "$CLEAN_REPO_ID" \
                             --branch "main" \
                             --upload-mode upload \
-                            --output sarif \
+                            --output cli \
                             --source "JENKINS" \
-                            #--output-file-path ./code_scan_results.json || true
+                            --output-file-path ./code_scan_results.json #|| true
                     '''
                 }
             }
@@ -195,9 +195,40 @@ pipeline {
                 }
             }
         }
-        
+
         //
-        // STAGE 6: AWS Deployment (Commented Out)
+        // STAGE 6: Generate SBOM
+        //
+        // This generates a Software Bill of Materials (SBOM) for the image 
+        // we just built and saves it as a JSON file.
+        stage('Generate SBOM') {
+            steps {
+                script {
+                    echo "--- Step 7: Generating SBOM ---"
+                    
+                    sh '''
+                        CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
+                        CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
+                        CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
+
+                        # Generate SBOM
+                        # We output to a JSON file so the 'post' step can archive it.
+                        
+                        ./cortexcli \
+                            --api-base-url "$CLEAN_URL" \
+                            --api-key "$CLEAN_KEY" \
+                            --api-key-id "$CLEAN_KEY_ID" \
+                            image sbom \
+                            --output-format json \
+                            --output-file "sbom-${BUILD_NUMBER}.json" \
+                            "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
+                    '''
+                }
+            }
+        }
+
+        //
+        // STAGE 7: AWS Deployment (Commented Out)
         //
         // Included per request for future use.
         stage('Deploy to AWS (Future)') {
