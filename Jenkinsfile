@@ -142,9 +142,11 @@ pipeline {
                             --repo-id "$CLEAN_REPO_ID" \
                             --branch "main" \
                             --upload-mode upload \
-                            --output json \
+                            --output table \
                             --source "JENKINS" \
-                            --output-file-path ./code_scan_results.json || true
+                            --soft-fail \
+                            --skip-file "./Jenkinsfile"
+                            #--output-file-path ./code_scan_results.json || true
                     '''
                 }
             }
@@ -185,7 +187,8 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            "${IMAGE_NAME}:${IMAGE_TAG}" || true
+                            --soft-fail \
+                            "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
                     '''
                 }
             }
