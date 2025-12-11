@@ -153,6 +153,7 @@ pipeline {
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
+                            --log-level debug \
                             code scan \
                             --directory . \
                             --repo-id "$CLEAN_REPO_ID" \
@@ -182,8 +183,6 @@ pipeline {
                     echo "--- Step 5: Building Docker Image ---"
                     // Builds the image defined in the Dockerfile
                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                    // SAVE IMAGE TO TARBALL to avoid scan timeouts
-                    sh "docker save -o ${IMAGE_NAME}.tar ${IMAGE_NAME}:${IMAGE_TAG}"
 
                 }
             }
@@ -228,7 +227,8 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             --log-level debug \
-                            image scan --archive "${IMAGE_NAME}.tar" 2>&1
+                            --timeout 300 \
+                            image scan "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
                     '''
                 }
             }
@@ -270,6 +270,8 @@ pipeline {
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
+                            --log-level debug \
+                            --timeout 300 \
                             image sbom "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 \
                             --output-format json \
                             --output-file "sbom-${BUILD_NUMBER}.json" #|| true 
