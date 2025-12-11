@@ -73,7 +73,7 @@ pipeline {
                     // 2. curl (for downloading)
                     // 3. docker-ce-cli (for docker commands)
                     // 4. default-jre (Java 11+ is REQUIRED for cortexcli image scan) 
-                    sh 'apt-get update && apt-get install -y jq curl docker-ce-cli default-jre git openjdk-17-jre docker.io'
+                    sh 'apt-get update && apt-get install -y jq curl default-jre git openjdk-17-jre docker.io'
 
                     echo "--- Step 3: Downloading Cortex CLI ---"
                     // Download logic using the authenticated API endpoint
