@@ -125,7 +125,7 @@ pipeline {
                     // --branch: The branch name (Required for historical tracking).
                     // --upload-mode upload: Ensures results are sent to Cortex Cloud.
                     // --output json: Useful for parsing, though standard output is human readable.
-                    // 
+                    // --output options --> (e.g., json, sarif, junitxml, spdx, cli, cyclonedx, cyclonedx_json).
                     // We use '|| true' to prevent the pipeline from failing immediately if vulnerabilities are found,
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
                     
@@ -145,7 +145,7 @@ pipeline {
                             --repo-id "$CLEAN_REPO_ID" \
                             --branch "main" \
                             --upload-mode upload \
-                            --output cli \ # (e.g., json, sarif, junitxml, spdx, cli, cyclonedx, cyclonedx_json).
+                            --output cli \ 
                             --source "JENKINS" \
                             #--output-file-path ./code_scan_results.json || true
                     '''
@@ -176,6 +176,7 @@ pipeline {
                     // Explanation of Commands [8]:
                     // 'image scan': The subcommand for container analysis.
                     // The last argument is the image tag to scan.
+                    // --output options --> (e.g., json, sarif, junitxml, spdx, cli, cyclonedx, cyclonedx_json).
                     
                     sh '''
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
@@ -188,7 +189,7 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --output cli \ # (e.g., json, sarif, junitxml, spdx, cli, cyclonedx, cyclonedx_json).
+                            --output cli \ 
                             "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
                     '''
                 }
