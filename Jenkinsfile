@@ -220,11 +220,22 @@ pipeline {
                         # 2. Prerequisites
                         java -version
 
-                        # 3. RUN SCAN (Absolute Path Method)
+                        # 3. Critical Environment Exports
+                        # Ensure the static binary can find the library we just installed
+                        export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+
+                        # 4. Prerequisite Verification
+                        echo "--- Debug: Checking Environment ---"
+                        java -version
+                        node -v
+                        ls -l /usr/lib/x86_64-linux-gnu/libhyperscan.so.5 || echo "WARNING: Hyperscan libs not found in expected path"
+
+                        # 5. RUN SCAN (Absolute Path Method)
                         ./cortexcli \
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
+                            --log-level debug \
                             image scan "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
                     '''
                 }
