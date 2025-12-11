@@ -75,6 +75,10 @@ pipeline {
                     // 4. default-jre (Java 11+ is REQUIRED for cortexcli image scan) 
                     sh 'apt-get update && apt-get install -y jq curl docker.io default-jre'
 
+                    // Debian 12 (Bookworm) does not have libhyperscan5, but Cortex needs it.
+                    curl -L -o libhyperscan5.deb http://ftp.us.debian.org/debian/pool/main/h/hyperscan/libhyperscan5_5.4.0-2_amd64.deb
+                    dpkg -i libhyperscan5.deb || true
+
                     echo "--- Step 3: Downloading Cortex CLI ---"
                     // Download logic using the authenticated API endpoint
                     sh '''
@@ -135,6 +139,7 @@ pipeline {
                             --branch "main" \
                             --upload-mode upload \
                             --output json \
+                            --source "JENKINS" \
                             --output-file-path ./code_scan_results.json || true
                     '''
                 }
