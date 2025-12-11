@@ -45,8 +45,9 @@ pipeline {
         
         //
         // Define artifact names for consistency
-        IMAGE_NAME = "jenkins_pipeline_cortex_cloud_cli"
-        IMAGE_TAG = "build-${BUILD_NUMBER}"
+        IMAGE_NAME = 'my-app'
+        IMAGE_TAG  = "${BUILD_NUMBER}"
+        ARCHIVE_NAME = "my-app-${BUILD_NUMBER}.tar"
     }
 
     stages {
@@ -99,7 +100,7 @@ pipeline {
                     
                         # Download and Install
                         curl -o cortexcli "$download_url"
-                        chmod +x cortexcli
+                        chmod +x ./cortexcli
                         
                         # Verify
                         ./cortexcli --version
@@ -184,6 +185,10 @@ pipeline {
                     echo "--- Step 5: Building Docker Image ---"
                     // Builds the image defined in the Dockerfile
                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    // Save image to tarball. 
+                    // -o specifies the output filename.
+                    sh 'docker save -o ${ARCHIVE_NAME} ${IMAGE_NAME}:${IMAGE_TAG}'
+
                 }
             }
         }
@@ -221,32 +226,14 @@ pipeline {
                         # 2. Prerequisites
                         java -version
 
-                        # 3. Create Archive (Save Docker image to file)
-                        echo "--- Saving Docker image to tar file... ---"
-                        docker save -o scan_target.tar "${IMAGE_NAME}:${IMAGE_TAG}"
-                        
-                        # Define Absolute Path (Helps avoid "file not found" errors)
-                        TAR_PATH="$(pwd)/scan_target.tar"
-                        ls -lh "$TAR_PATH"
-
-                        # 4. CRITICAL DEBUG: Run Help WITH KEYS
-                        # We must see the manual to know if it expects "--archive" or "--archive=true"
-                        echo "--- Debug: Printing CLI Manual ---"
+                        # 3. RUN SCAN (Absolute Path Method)
                         ./cortexcli \
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
-                            image scan --help || true
-
-                        # 5. RUN SCAN (Absolute Path Method)
-                        # Trying the syntax exactly as described in your docs: "--archive <filename>"
-                        echo "--- Running Scan on $TAR_PATH ---"
-                        
-                        ./cortexcli \
-                            --api-base-url "$CLEAN_URL" \
-                            --api-key "$CLEAN_KEY" \
-                            --api-key-id "$CLEAN_KEY_ID" \
-                            image scan "${IMAGE_NAME}:${IMAGE_TAG}"
+                            image scan \
+                            --archive true \
+                            ${ARCHIVE_NAME}
                     '''
                 }
             }
