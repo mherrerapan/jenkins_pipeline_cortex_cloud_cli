@@ -119,19 +119,11 @@ pipeline {
                     // We use '|| true' to prevent the pipeline from failing immediately if vulnerabilities are found,
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
                     sh '''
-                        echo "============================================="
-                        echo "   DEBUGGING VARIABLES (Bracket Check)       "
-                        echo "============================================="
-                        echo "API_URL:    [${CORTEX_CLOUD_API_URL}]"
-                        echo "API_KEY: [${CORTEX_CLOUD_API_KEY}]"
-                        echo "API_KEY_ID: [${CORTEX_CLOUD_API_KEY_ID}]"
-                        echo "REPO_ID:    [${GITHUB_REPO_ID}]"
-                        echo "============================================="
-
-                        ./cortexcli code scan \
+                        ./cortexcli \
                             --api-base-url "${CORTEX_CLOUD_API_URL}" \
                             --api-key "${CORTEX_CLOUD_API_KEY}" \
                             --api-key-id "${CORTEX_CLOUD_API_KEY_ID}" \
+                            code scan \
                             --directory . \
                             --repo-id "${GITHUB_REPO_ID}" \
                             --branch "main" \
@@ -168,10 +160,11 @@ pipeline {
                     // The last argument is the image tag to scan.
                     
                     sh '''
-                        ./cortexcli image scan \
+                        ./cortexcli \
                             --api-base-url "${CORTEX_CLOUD_API_URL}" \
                             --api-key "${CORTEX_CLOUD_API_KEY}" \
                             --api-key-id "${CORTEX_CLOUD_API_KEY_ID}" \
+                            image scan \
                             "${IMAGE_NAME}:${IMAGE_TAG}" || true
                     '''
                 }
