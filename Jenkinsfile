@@ -73,19 +73,17 @@ pipeline {
                     // 2. curl (for downloading)
                     // 3. docker.io (for docker commands)
                     // 4. default-jre (Java 11+ is REQUIRED for cortexcli image scan) 
-                    sh 'apt-get update && apt-get install -y jq curl docker.io default-jre'
+                    sh 'apt-get update && apt-get install -y jq curl docker.io default-jre binutils'
 
                     echo "--- Step 3: Downloading Cortex CLI ---"
                     // Download logic using the authenticated API endpoint
                     sh '''
-                        # 1. Install Standard Dependencies
-                        apt-get update
-                        apt-get install -y jq curl docker.io default-jre
+                        set -e # Fail script immediately if any command fails
 
                         # 2. Manually install libhyperscan5 (Required for Image Scan)
                         # This library was removed in Debian 12 (Bookworm) but is required by Cortex.
                         # We download the Debian 11 (Bullseye) version which works.
-                        curl -L -o libhyperscan5.deb http://ftp.us.debian.org/debian/pool/main/h/hyperscan/libhyperscan5_5.4.0-2_amd64.deb
+                        curl -f -L -o libhyperscan5.deb http://ftp.us.debian.org/debian/pool/main/h/hyperscan/libhyperscan5_5.4.0-2_amd64.deb
                         apt-get install -y ./libhyperscan5.deb
 
                         # 3. Download Cortex CLI
