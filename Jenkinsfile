@@ -195,13 +195,19 @@ pipeline {
                         CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
                         CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
 
-                        # 2. RUN COMMAND (With Auth Flags First)
+                        # 2. Debugging: List images to ensure the tag exists and Docker is accessible
+                        echo "--- Debug: Docker Images Available ---"
+                        docker images
+
+                        # 3. RUN COMMAND (With Auth Flags First)
                         ./cortexcli \
                             --api-base-url "$CLEAN_URL" \
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 #|| true
+                            --docker-address "unix:///var/run/docker.sock" \
+                            "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 
+                            #|| true
                     '''
                 }
             }
