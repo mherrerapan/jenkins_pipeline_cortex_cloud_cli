@@ -155,7 +155,7 @@ pipeline {
                             --api-key-id "$CLEAN_KEY_ID" \
                             --log-level debug \
                             code scan \
-                            --directory "\$(pwd)" \
+                            --directory . \
                             --repo-id "$CLEAN_REPO_ID" \
                             --branch "main" \
                             --upload-mode upload \
