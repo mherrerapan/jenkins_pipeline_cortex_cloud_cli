@@ -119,13 +119,19 @@ pipeline {
                     // We use '|| true' to prevent the pipeline from failing immediately if vulnerabilities are found,
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
                     sh '''
+                        CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
+                        CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
+                        CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
+                        CLEAN_REPO_ID=$(echo "${GITHUB_REPO_ID}" | tr -d '\n\r')
+
+                        # 2. RUN COMMAND (With Auth Flags First)
                         ./cortexcli \
-                            --api-base-url "${CORTEX_CLOUD_API_URL}" \
-                            --api-key "${CORTEX_CLOUD_API_KEY}" \
-                            --api-key-id "${CORTEX_CLOUD_API_KEY_ID}" \
+                            --api-base-url "$CLEAN_URL" \
+                            --api-key "$CLEAN_KEY" \
+                            --api-key-id "$CLEAN_KEY_ID" \
                             code scan \
                             --directory . \
-                            --repo-id "${GITHUB_REPO_ID}" \
+                            --repo-id "$CLEAN_REPO_ID" \
                             --branch "main" \
                             --upload-mode upload \
                             --output json \
@@ -160,10 +166,15 @@ pipeline {
                     // The last argument is the image tag to scan.
                     
                     sh '''
+                        CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
+                        CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
+                        CLEAN_KEY_ID=$(echo "${CORTEX_CLOUD_API_KEY_ID}" | tr -d '\n\r')
+
+                        # 2. RUN COMMAND (With Auth Flags First)
                         ./cortexcli \
-                            --api-base-url "${CORTEX_CLOUD_API_URL}" \
-                            --api-key "${CORTEX_CLOUD_API_KEY}" \
-                            --api-key-id "${CORTEX_CLOUD_API_KEY_ID}" \
+                            --api-base-url "$CLEAN_URL" \
+                            --api-key "$CLEAN_KEY" \
+                            --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
                             "${IMAGE_NAME}:${IMAGE_TAG}" || true
                     '''
