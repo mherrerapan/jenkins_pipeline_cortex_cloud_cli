@@ -199,7 +199,7 @@ pipeline {
             // The 'when' block below forces Jenkins to skip this stage.
             // To re-enable the scan later, change return to true:
             when {
-                expression { return false }
+                expression { return true }
             }
             // -----------------------------------------------------------
             steps {
