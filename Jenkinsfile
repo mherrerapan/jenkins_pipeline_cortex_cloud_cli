@@ -205,7 +205,7 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --docker-address "unix:///var/run/docker.sock" \
+                            --docker-host "unix:///var/run/docker.sock" \
                             "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1 
                             #|| true
                     '''
