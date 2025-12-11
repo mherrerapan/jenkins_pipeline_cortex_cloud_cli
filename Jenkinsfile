@@ -116,6 +116,8 @@ pipeline {
             steps {
                 script {
                     echo "--- Step 4: Running Cortex Code Scan ---"
+                    // 1. Create ignore file dynamically to exclude Jenkinsfile
+                    sh 'echo "Jenkinsfile" > .cortexignore'
                     // Explanation of Flags [1, 7]:
                     // --api-base-url: The tenant URL.
                     // --directory .: Scan the current workspace directory.
@@ -126,6 +128,7 @@ pipeline {
                     // 
                     // We use '|| true' to prevent the pipeline from failing immediately if vulnerabilities are found,
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
+                    
                     sh '''
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
                         CLEAN_KEY=$(echo "${CORTEX_CLOUD_API_KEY}" | tr -d '\n\r')
@@ -144,7 +147,6 @@ pipeline {
                             --upload-mode upload \
                             --output table \
                             --source "JENKINS" \
-                            --skip-file "./Jenkinsfile"
                             #--output-file-path ./code_scan_results.json || true
                     '''
                 }
@@ -186,7 +188,6 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --soft-fail \
                             "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
                     '''
                 }
