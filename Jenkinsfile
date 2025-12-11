@@ -75,29 +75,33 @@ pipeline {
                     // 4. default-jre (Java 11+ is REQUIRED for cortexcli image scan) 
                     sh 'apt-get update && apt-get install -y jq curl docker.io default-jre'
 
-                    // Debian 12 (Bookworm) does not have libhyperscan5, but Cortex needs it.
-                    curl -L -o libhyperscan5.deb http://ftp.us.debian.org/debian/pool/main/h/hyperscan/libhyperscan5_5.4.0-2_amd64.deb
-                    dpkg -i libhyperscan5.deb || true
-
                     echo "--- Step 3: Downloading Cortex CLI ---"
                     // Download logic using the authenticated API endpoint
                     sh '''
-                        # 1. Request the signed download URL from Cortex Cloud
-                        # Note: We specifically request the 'linux' OS and 'amd64' architecture.
+                        # 1. Install Standard Dependencies
+                        apt-get update
+                        apt-get install -y jq curl docker.io default-jre
+
+                        # 2. Manually install libhyperscan5 (Required for Image Scan)
+                        # This library was removed in Debian 12 (Bookworm) but is required by Cortex.
+                        # We download the Debian 11 (Bullseye) version which works.
+                        curl -L -o libhyperscan5.deb http://ftp.us.debian.org/debian/pool/main/h/hyperscan/libhyperscan5_5.4.0-2_amd64.deb
+                        dpkg -i libhyperscan5.deb || true
+
+                        # 3. Download Cortex CLI
+                        # Request the signed download URL from Cortex Cloud
                         response=$(curl -s -X GET "${CORTEX_CLOUD_API_URL}/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" \
                             -H "x-xdr-auth-id: ${CORTEX_CLOUD_API_KEY_ID}" \
                             -H "Authorization: ${CORTEX_CLOUD_API_KEY}")
                     
-                        # 2. Parse the JSON response to extract the URL
+                        # Parse the JSON response
                         download_url=$(echo $response | jq -r ".signed_url")
                     
-                        # 3. Download the binary
+                        # Download and Install
                         curl -o cortexcli "$download_url"
-                    
-                        # 4. Make the binary executable
                         chmod +x cortexcli
-                    
-                        # 5. Verify installation
+                        
+                        # Verify
                         ./cortexcli --version
                     '''
                 }
