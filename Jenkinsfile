@@ -145,7 +145,7 @@ pipeline {
                             --repo-id "$CLEAN_REPO_ID" \
                             --branch "main" \
                             --upload-mode upload \
-                            --output cli \
+                            --output sarif \
                             --source "JENKINS" \
                             #--output-file-path ./code_scan_results.json || true
                     '''
@@ -176,7 +176,7 @@ pipeline {
                     // Explanation of Commands [8]:
                     // 'image scan': The subcommand for container analysis.
                     // The last argument is the image tag to scan.
-                    // --output options --> (e.g., json, sarif, junitxml, spdx, cli, cyclonedx, cyclonedx_json).
+                    // --output options --> (human-readable, json (default: human-readable)).
                     
                     sh '''
                         CLEAN_URL=$(echo "${CORTEX_CLOUD_API_URL}" | tr -d '\n\r')
@@ -189,13 +189,13 @@ pipeline {
                             --api-key "$CLEAN_KEY" \
                             --api-key-id "$CLEAN_KEY_ID" \
                             image scan \
-                            --output cli \
+                            --output-format human-readable \
                             "${IMAGE_NAME}:${IMAGE_TAG}" #|| true
                     '''
                 }
             }
         }
-
+        
         //
         // STAGE 6: AWS Deployment (Commented Out)
         //
