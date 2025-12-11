@@ -147,7 +147,7 @@ pipeline {
                             --upload-mode upload \
                             --output cli \
                             --source "JENKINS" \
-                            --output-file-path ./code_scan_results.json #|| true
+                            #--output-file-path ./code_scan_results.json || true
                     '''
                 }
             }
