@@ -136,6 +136,7 @@ pipeline {
                     // We use '|| true' to prevent the pipeline from failing immediately if vulnerabilities are found,
                     // allowing us to proceed to the image scan. In production, you might remove this to block builds.
                     // --log-level debug \ if you want to see more detailed logs
+                    // --create-repo-if-missing 
                     
                     sh '''
                         # 1. Enable Shell Verbosity (Prints every command being run)
@@ -161,7 +162,6 @@ pipeline {
                             --upload-mode upload \
                             --output cli \
                             --source "JENKINS" 2>&1 
-                            --create-repo-if-missing
                             --skip-path "Jenkinsfile" || true
                             #--output-file-path ./code_scan_results.json 2>&1 || true
                     '''
