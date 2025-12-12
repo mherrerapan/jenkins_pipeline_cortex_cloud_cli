@@ -9,7 +9,7 @@ pipeline {
     // 2. We meet the Cortex CLI requirement for GLIBC >= 2.35 (Bookworm provides 2.36).
     agent {
         docker {
-            image 'node:22-bookworm'
+            image 'Ubuntu 22.04'
             // We mount the Docker socket to allow "Docker-in-Docker".
             // This is required so the pipeline can run 'docker build' commands.
             args '-u root --privileged -v /var/run/docker.sock:/var/run/docker.sock'
@@ -83,8 +83,8 @@ pipeline {
                         # 2. Manually install libhyperscan5 (Required for Image Scan)
                         # This library was removed in Debian 12 (Bookworm) but is required by Cortex.
                         # We download the Debian 11 (Bullseye) version which works.
-                        curl -f -L -o libhyperscan5.deb http://ftp.us.debian.org/debian/pool/main/h/hyperscan/libhyperscan5_5.4.0-2_amd64.deb
-                        apt-get install -y ./libhyperscan5.deb
+                        #curl -f -L -o libhyperscan5.deb http://ftp.us.debian.org/debian/pool/main/h/hyperscan/libhyperscan5_5.4.0-2_amd64.deb
+                        #apt-get install -y ./libhyperscan5.deb
 
                         # 3. Download Cortex CLI
                         # Request the signed download URL from Cortex Cloud
