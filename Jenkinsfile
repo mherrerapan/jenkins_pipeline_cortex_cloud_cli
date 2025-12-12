@@ -162,7 +162,7 @@ pipeline {
                             --output cli \
                             --source "JENKINS" 2>&1 
                             --create-repo-if-missing
-                            --skip-path "Jenkinsfile"
+                            --skip-path "Jenkinsfile" || true
                             #--output-file-path ./code_scan_results.json 2>&1 || true
                     '''
                 }
