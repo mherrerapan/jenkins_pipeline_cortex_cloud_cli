@@ -233,6 +233,7 @@ pipeline {
                                 image scan \
                                 --timeout 300 \
                                 "${IMAGE_NAME}:${IMAGE_TAG}" 2>&1
+                                #--output-file-path ./image_scan_results.json 2>&1 || true
                         '''
                     }
                 }
