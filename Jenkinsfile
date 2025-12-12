@@ -9,7 +9,7 @@ pipeline {
     // 2. We meet the Cortex CLI requirement for GLIBC >= 2.35 (Bookworm provides 2.36).
     agent {
         docker {
-            image 'Ubuntu 22.04'
+            image 'cimg/node:20.11.0'
             // We mount the Docker socket to allow "Docker-in-Docker".
             // This is required so the pipeline can run 'docker build' commands.
             args '-u root --privileged -v /var/run/docker.sock:/var/run/docker.sock'
